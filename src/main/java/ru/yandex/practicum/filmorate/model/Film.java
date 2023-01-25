@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.model;
 
-import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -17,36 +16,8 @@ public class Film {
 
     private int id;
     private String name;
-    @Size(max = 200)
     private String description;
     private LocalDate releaseDate;
     private long duration;
 
-    /*public Film(int filmId, String name, String description, LocalDate releaseDate, Integer duration) {
-        this.filmId = filmId;
-        this.name = name;
-        this.description = description;
-        this.releaseDate = releaseDate;
-        this.duration = duration;
-    }
-
-    public int getFilmId() {
-        return filmId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public LocalDate getReleaseDate() {
-        return releaseDate;
-    }
-
-    public Integer getDuration() {
-        return duration;
-    }*/
 }

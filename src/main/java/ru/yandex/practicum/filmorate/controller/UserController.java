@@ -23,7 +23,7 @@ public class UserController {
 
     @GetMapping
     public Collection<User> findAllUsers() {
-        log.debug("GET-запрос: получить коллекцию всех пользователей.");
+        log.debug("GET-запрос: получить список всех пользователей.");
         return userService.findAllUsers();
     }
 

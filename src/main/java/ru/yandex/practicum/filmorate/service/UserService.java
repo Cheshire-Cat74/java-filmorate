@@ -19,7 +19,7 @@ public class UserService {
     private final Map<Integer, User> users = new HashMap<>();
     private static final AtomicInteger id = new AtomicInteger(0);
 
-    public UserService(HashMap<Object, Object> objectObjectHashMap) {
+    public UserService(HashMap<Object, Object> objectHashMap) {
 
     }
 
