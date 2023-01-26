@@ -24,13 +24,8 @@ class FilmControllerTest {
     @BeforeEach
     void beforeEach() {
         filmController = new FilmController(new FilmService(new HashMap<>()));
-        film = Film.builder()
-                .id(1)
-                .name("FilmName")
-                .description("FilmDescription")
-                .releaseDate(LocalDate.of(2020, 10, 12))
-                .duration(120)
-                .build();
+        film = buildFilm(1, "FilmName", "FilmDescription",
+                LocalDate.of(2020, 10, 12), 120);
     }
 
     @Test
@@ -41,13 +36,9 @@ class FilmControllerTest {
 
     @Test
     void shouldUpdateFilm() {
-        Film film2 = Film.builder()
-                .id(1)
-                .name("FilmName")
-                .description("FilmNewDescription")
-                .releaseDate(LocalDate.of(2020, 10, 12))
-                .duration(130)
-                .build();
+        Film film2 = buildFilm(1, "FilmName", "FilmNewDescription",
+                LocalDate.of(2020, 10, 12), 130);
+
         filmController.addFilm(film);
         filmController.updateFilm(film2);
         List<Film> filmList = new ArrayList<>();
@@ -57,13 +48,9 @@ class FilmControllerTest {
 
     @Test
     void shouldGetAllFilms() {
-        Film film2 = Film.builder()
-                .id(2)
-                .name("NewFilmName")
-                .description("Film2Description")
-                .releaseDate(LocalDate.of(2020, 10, 12))
-                .duration(130)
-                .build();
+        Film film2 = buildFilm(2, "NewFilmName", "Film2Description",
+                LocalDate.of(2020, 10, 12), 130);
+
         filmController.addFilm(film2);
         filmController.addFilm(film);
         assertEquals(2, filmController.findAllFilms().size());
@@ -71,13 +58,8 @@ class FilmControllerTest {
 
     @Test
     void shouldThrowExceptionThenAddEmptyName() {
-        Film film2 = Film.builder()
-                .id(2)
-                .name("")
-                .description("Film2Description")
-                .releaseDate(LocalDate.of(2020, 10, 12))
-                .duration(130)
-                .build();
+        Film film2 = buildFilm(2, "", "Film2Description",
+                LocalDate.of(2020, 10, 12), 130);
 
         ValidationException exception = assertThrows(ValidationException.class, () -> filmController.addFilm(film2));
         assertEquals(exception.getMessage(), exception.getMessage());
@@ -86,15 +68,10 @@ class FilmControllerTest {
 
     @Test
     void shouldTrowExceptionThenAddTooLongDescription() {
-        Film film2 = Film.builder()
-                .id(2)
-                .name("Film2Name")
-                .description("В этом описании более 200 символов, по этой причине создание объекта с полем " +
-                        "film.description не пройдет валидацию контроллера. В поле необходимо указать описание " +
-                        "фильма, не превышающим количество символов, равное 200.")
-                .releaseDate(LocalDate.of(2020, 10, 12))
-                .duration(130)
-                .build();
+        Film film2 = buildFilm(2, "Film2Name", "В этом описании более 200 символов, " +
+                "по этой причине создание объекта с полем film.description не пройдет валидацию контроллера. " +
+                "В поле необходимо указать описание фильма, не превышающим количество символов, равное 200.",
+                LocalDate.of(2020, 10, 12), 130);
 
         ValidationException exception = assertThrows(ValidationException.class, () -> filmController.addFilm(film2));
         assertEquals(exception.getMessage(), exception.getMessage());
@@ -103,13 +80,8 @@ class FilmControllerTest {
 
     @Test
     void shouldThrowExceptionThenAddTooEarlierDateRelease() {
-        Film film2 = Film.builder()
-                .id(2)
-                .name("Film2Name")
-                .description("Film2Description")
-                .releaseDate(LocalDate.of(1890, 10, 12))
-                .duration(130)
-                .build();
+        Film film2 = buildFilm(2, "Film2Name", "Film2Description", LocalDate.of(1890, 10,
+                12), 130);
 
         ValidationException exception = assertThrows(ValidationException.class, () -> filmController.addFilm(film2));
         assertEquals(exception.getMessage(), exception.getMessage());
@@ -118,16 +90,22 @@ class FilmControllerTest {
 
     @Test
     void shouldThrowExceptionThenAddNegativeDuration() {
-        Film film2 = Film.builder()
-                .id(2)
-                .name("Film2Name")
-                .description("Film2Description")
-                .releaseDate(LocalDate.of(1990, 10, 12))
-                .duration(-1)
-                .build();
+        Film film2 = buildFilm(2, "Film2Name", "Film2Description", LocalDate.of(1990, 10,
+                12), -1);
 
         ValidationException exception = assertThrows(ValidationException.class, () -> filmController.addFilm(film2));
         assertEquals(exception.getMessage(), exception.getMessage());
         assertEquals(0, filmController.findAllFilms().size());
+    }
+
+    private Film buildFilm(int id, String name, String description, LocalDate releaseDate, long duration) {
+
+        return Film.builder()
+                .id(id)
+                .name(name)
+                .description(description)
+                .releaseDate(releaseDate)
+                .duration(duration)
+                .build();
     }
 }
