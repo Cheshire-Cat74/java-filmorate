@@ -1,26 +1,37 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Data;
-import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.With;
 
-import java.time.LocalDate;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
-@Slf4j
-@Data
-@Builder
-@FieldDefaults(level = AccessLevel.PRIVATE)
+import java.util.Set;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public class Film {
-
-    public static final LocalDate EARLIEST_DATE_OF_RELEASE = LocalDate.of(1895, 12, 28);
-    public static final int MAX_LENGTH_OF_DESCRIPTION = 200;
-
+    @With
     int id;
+    @NotBlank
     String name;
+    @Size(max = 200)
     String description;
-    LocalDate releaseDate;
+    String releaseDate;
+    @DecimalMin("0")
     long duration;
+    @With
+    Set<Integer> likedUsersIds;
 
+    @JsonIgnore
+    public Integer getLikesCount() {
+        return likedUsersIds.size();
+    }
 }
