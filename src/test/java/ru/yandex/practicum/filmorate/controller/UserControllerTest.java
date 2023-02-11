@@ -176,31 +176,25 @@ class UserControllerTest {
     private HttpResponse<String> sendRequest(User user, String method) {
         HttpResponse<String> response;
         try {
-            String serverAdress = "http://localhost:8080/users";
-            String body;
+            String serverAddress = "http://localhost:8080/users";
+            String body = mapper.writeValueAsString(user);
             HttpRequest request;
+            HttpRequest.Builder builder = HttpRequest
+                    .newBuilder()
+                    .header("Content-Type", "application/json")
+                    .uri(URI.create(serverAddress));
             if ("POST".equals(method)) {
-                body = mapper.writeValueAsString(user);
-                request = HttpRequest
-                        .newBuilder()
+                request =
+                        builder
                         .POST(HttpRequest.BodyPublishers.ofString(body))
-                        .header("Content-Type", "application/json")
-                        .uri(URI.create(serverAdress))
                         .build();
             } else if ("PUT".equals(method)) {
-                body = mapper.writeValueAsString(user);
-                request = HttpRequest
-                        .newBuilder()
+                request = builder
                         .PUT(HttpRequest.BodyPublishers.ofString(body))
-                        .header("Content-Type", "application/json")
-                        .uri(URI.create(serverAdress))
                         .build();
             } else if ("GET".equals(method)) {
-                request = HttpRequest
-                        .newBuilder()
+                request = builder
                         .GET()
-                        .header("Content-Type", "application/json")
-                        .uri(URI.create(serverAdress))
                         .build();
             } else {
                 throw new RuntimeException("Не правильно указан Http-метод");

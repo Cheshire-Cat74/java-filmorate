@@ -22,6 +22,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class FilmController {
+
+    private static final String COMMON_PATH = "/{id}/like/{userId}";
     private final FilmService filmService;
 
     @GetMapping("/{id}")
@@ -29,13 +31,13 @@ public class FilmController {
         return filmService.getFilmById(id);
     }
 
-    @PutMapping("/{id}/like/{userId}")
+    @PutMapping(COMMON_PATH)
     public void addLike(@PathVariable Integer id,
                         @PathVariable Integer userId) {
         filmService.addLike(id, userId);
     }
 
-    @DeleteMapping("/{id}/like/{userId}")
+    @DeleteMapping(COMMON_PATH)
     public void removeLike(@PathVariable Integer id,
                            @PathVariable Integer userId) {
         filmService.removeLike(id, userId);

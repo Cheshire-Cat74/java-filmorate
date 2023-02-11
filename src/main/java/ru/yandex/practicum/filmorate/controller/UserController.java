@@ -19,6 +19,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
+
+    private static final String COMMON_PATH = "/{id}/friends/{friendId}";
     private final UserService userService;
 
     @GetMapping("/{id}")
@@ -26,13 +28,13 @@ public class UserController {
         return userService.getUserById(id);
     }
 
-    @PutMapping("/{id}/friends/{friendId}")
+    @PutMapping(COMMON_PATH)
     public void addFriend(@PathVariable Integer id,
                           @PathVariable Integer friendId) {
         userService.addFriend(id, friendId);
     }
 
-    @DeleteMapping("/{id}/friends/{friendId}")
+    @DeleteMapping(COMMON_PATH)
     public void removeFriend(@PathVariable Integer id,
                              @PathVariable Integer friendId) {
         userService.removeFriend(id, friendId);

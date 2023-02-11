@@ -133,31 +133,25 @@ class FilmControllerTest {
     private HttpResponse<String> sendRequest(Film film, String method) {
         HttpResponse<String> response;
         try {
-            String serverAdress = "http://localhost:8080/films";
-            String body;
+            String serverAddress = "http://localhost:8080/films";
+            String body = mapper.writeValueAsString(film);
+            HttpRequest.Builder builder = HttpRequest
+                    .newBuilder()
+                    .header("Content-Type", "application/json")
+                    .uri(URI.create(serverAddress));
             HttpRequest request;
+
             if ("POST".equals(method)) {
-                body = mapper.writeValueAsString(film);
-                request = HttpRequest
-                        .newBuilder()
+                request = builder
                         .POST(HttpRequest.BodyPublishers.ofString(body))
-                        .header("Content-Type", "application/json")
-                        .uri(URI.create(serverAdress))
                         .build();
             } else if ("PUT".equals(method)) {
-                body = mapper.writeValueAsString(film);
-                request = HttpRequest
-                        .newBuilder()
+                request = builder
                         .PUT(HttpRequest.BodyPublishers.ofString(body))
-                        .header("Content-Type", "application/json")
-                        .uri(URI.create(serverAdress))
                         .build();
             } else if ("GET".equals(method)) {
-                request = HttpRequest
-                        .newBuilder()
+                request = builder
                         .GET()
-                        .header("Content-Type", "application/json")
-                        .uri(URI.create(serverAdress))
                         .build();
             } else {
                 throw new RuntimeException("Не правильно указан Http-метод");
