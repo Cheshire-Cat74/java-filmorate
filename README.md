@@ -1,2 +1,2 @@
 # java-filmorate
-Template repository for Filmorate project.
+![This is an image](C:\Users\vicka\Downloads\drawSQL-java-filmorate-export-2023-03-08.png)
