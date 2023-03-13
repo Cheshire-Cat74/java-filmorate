@@ -2,32 +2,27 @@ package ru.yandex.practicum.filmorate.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.util.Map;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import ru.yandex.practicum.filmorate.model.ErrorResponse;
 
 @RestControllerAdvice("ru.yandex.practicum.filmorate.controller")
-public class ExceptionHandlers {
-    @ExceptionHandler
-    public ResponseEntity<Map<String, String>> notFoundExceptionHandler(final NotFoundException e) {
-        return new ResponseEntity<>(Map.of("error: ", e.getMessage()), HttpStatus.NOT_FOUND);
+public class ExceptionHandlers extends ResponseEntityExceptionHandler {
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<Object> handleValidationException(ValidationException e, WebRequest request) {
+        return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler
-    public ResponseEntity<Map<String, String>> validationExceptionHandler(final ValidationException e) {
-        return new ResponseEntity<>(Map.of("error: ", e.getMessage()), HttpStatus.BAD_REQUEST);
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<Object> handleNotFoundException(NotFoundException e, WebRequest request) {
+        return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler
-    public ResponseEntity<Map<String, String>> validationModelExceptionHandler(final MethodArgumentNotValidException e) {
-        return new ResponseEntity<>(Map.of("error: ", e.getMessage()), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<Map<String, String>> otherExceptionHandler(final Exception e) {
-        return new ResponseEntity<>(Map.of("error: ", e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Object> handleValidationException(Exception e, WebRequest request) {
+        return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
 
