@@ -1,11 +1,14 @@
 package ru.yandex.practicum.filmorate.model;
 
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.experimental.FieldDefaults;
 
 @Data
+@FieldDefaults(level= AccessLevel.PRIVATE)
 public class Genre implements Comparable<Genre> {
-    private long id;
-    private String name;
+    long id;
+    String name;
 
     @Override
     public int compareTo(Genre genre) {

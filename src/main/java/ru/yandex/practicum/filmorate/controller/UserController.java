@@ -25,6 +25,8 @@ import java.util.Set;
 @AllArgsConstructor
 public class UserController {
 
+    private static final String PATH_TO_FRIEND_ID = "/{id}/friends/{friendId}";
+    private static final String PATH_TO_FRIENDS = "/{id}/friends";
     private final UserService userService;
 
     @GetMapping
@@ -55,28 +57,28 @@ public class UserController {
         return userService.update(user);
     }
 
-    @PutMapping("/{id}/friends/{friendId}")
+    @PutMapping(PATH_TO_FRIEND_ID)
     @ResponseStatus(HttpStatus.OK)
     public void addToFriends(@PathVariable Long id, @PathVariable Long friendId) {
         log.info("/users add to friends");
         userService.addToFriends(id, friendId);
     }
 
-    @DeleteMapping("/{id}/friends/{friendId}")
+    @DeleteMapping(PATH_TO_FRIEND_ID)
     @ResponseStatus(HttpStatus.OK)
     public void removeFromFriends(@PathVariable Long id, @PathVariable Long friendId) {
         log.info("/users remove from friends");
         userService.removeFromFriends(id, friendId);
     }
 
-    @GetMapping("/{id}/friends")
+    @GetMapping(PATH_TO_FRIENDS)
     @ResponseBody
     public List<User> getFriends(@PathVariable Long id) {
         log.info("/users get friends");
         return userService.getFriends(id);
     }
 
-    @GetMapping("/{id}/friends/common/{otherId}")
+    @GetMapping(PATH_TO_FRIENDS + "/common/{otherId}")
     @ResponseBody
     public Set<User> getCommonFriends(@PathVariable Long id, @PathVariable Long otherId) {
         log.info("/users get common friends");

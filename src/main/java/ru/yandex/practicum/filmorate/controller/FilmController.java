@@ -26,6 +26,7 @@ import java.util.List;
 @AllArgsConstructor
 public class FilmController {
 
+    private static final String COMMON_PATH = "/{id}/like/{userId}";
     private final FilmService filmService;
 
     @GetMapping
@@ -56,14 +57,14 @@ public class FilmController {
         return filmService.update(film);
     }
 
-    @PutMapping("/{id}/like/{userId}")
+    @PutMapping(COMMON_PATH)
     @ResponseStatus(HttpStatus.OK)
     public void like(@PathVariable Long id, @PathVariable Long userId) {
         log.info("/films like");
         filmService.addLike(id, userId);
     }
 
-    @DeleteMapping("/{id}/like/{userId}")
+    @DeleteMapping(COMMON_PATH)
     @ResponseStatus(HttpStatus.OK)
     public void removeLike(@PathVariable Long id, @PathVariable Long userId) {
         log.info("/films remove like");
