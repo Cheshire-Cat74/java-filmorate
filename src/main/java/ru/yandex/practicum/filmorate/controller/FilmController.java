@@ -1,43 +1,82 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
-import java.util.Collection;
+import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/films")
-@RequiredArgsConstructor
-@Slf4j
+@AllArgsConstructor
 public class FilmController {
+
+    private static final String COMMON_PATH = "/{id}/like/{userId}";
     private final FilmService filmService;
 
     @GetMapping
-    public Collection<Film> findAllFilms() {
-        log.debug("GET-запрос: получить коллекцию всех фильмов.");
-        return filmService.findAllFilms();
+    @ResponseBody
+    public List<Film> getAll() {
+        log.info("/films get all");
+        return filmService.getAll();
+    }
+
+    @GetMapping("/{id}")
+    @ResponseBody
+    public Film get(@PathVariable Long id) {
+        log.info("/films get by id");
+        return filmService.getById(id);
     }
 
     @PostMapping
-    public Film addFilm(@RequestBody Film film) {
-        log.debug("POST-запрос: добавить новый фильм.");
-        return filmService.addFilm(film);
+    @ResponseBody
+    public Film post(@RequestBody Film film) {
+        log.info("/films post");
+        return filmService.add(film);
     }
 
     @PutMapping
-    public Film updateFilm(@RequestBody Film film) {
-        log.debug("PUT-запрос: обновить фильм.");
-        return filmService.updateFilm(film);
+    @ResponseBody
+    public Film put(@RequestBody Film film) {
+        log.info("/films patch");
+        return filmService.update(film);
+    }
+
+    @PutMapping(COMMON_PATH)
+    @ResponseStatus(HttpStatus.OK)
+    public void like(@PathVariable Long id, @PathVariable Long userId) {
+        log.info("/films like");
+        filmService.addLike(id, userId);
+    }
+
+    @DeleteMapping(COMMON_PATH)
+    @ResponseStatus(HttpStatus.OK)
+    public void removeLike(@PathVariable Long id, @PathVariable Long userId) {
+        log.info("/films remove like");
+        filmService.removeLike(id, userId);
+    }
+
+    @GetMapping(value = "/popular")
+    @ResponseBody
+    public List<Film> getTop(@RequestParam(defaultValue = "10") Integer count) {
+        log.info("/films get top");
+        return filmService.getTopNFilms(count);
     }
 }
-
 
 

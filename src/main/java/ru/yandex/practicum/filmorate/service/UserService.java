@@ -1,72 +1,90 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class UserService {
-    private final Map<Integer, User> users = new HashMap<>();
-    private static final AtomicInteger id = new AtomicInteger(0);
+    private static final String SPACE = " ";
+    private static final String AT = "@";
 
-    public UserService(HashMap<Object, Object> objectHashMap) {
+    private final UserStorage storage;
 
+    public List<User> getAll() {
+        return storage.findAll();
     }
 
-    public Collection<User> findAllUsers() {
-        log.debug("Успешно возвращена коллекция пользователей.");
-        return users.values();
+    public User getById(Long id) {
+        return storage.findById(id);
     }
 
-    public User createUser(User user) {
-        validateUser(user);
-        user.setId(id.incrementAndGet());
-        users.put(user.getId(), user);
-        log.debug("Успешно создан новый пользователь с id=" + user.getId());
-        return user;
+    public User add(User user) {
+        this.validate(user);
+        return storage.insert(user);
     }
 
-    public User updateUser(User user) {
-        validateUser(user);
-        if (!users.containsKey(user.getId())) {
-            throw new ValidationException("Пользователь с id=" + user.getId() + " не найден.");
+    public User update(User user) {
+        this.validate(user);
+        return storage.update(user);
+    }
+
+    public void addToFriends(Long id, Long friendId) {
+        User user = getById(id);
+        User friend = getById(friendId);
+        user.getFriends().add(friendId);
+        update(user);
+    }
+
+    public void removeFromFriends(Long id, Long friendId) {
+        User user = getById(id);
+        User friend = getById(friendId);
+        user.getFriends().remove(friendId);
+        update(user);
+    }
+
+    public List<User> getFriends(Long id) {
+        return this.getById(id).getFriends().stream().map(this::getById).collect(Collectors.toList());
+    }
+
+    public Set<User> findCommonFriends(Long id, Long otherId) {
+        Set<Long> intersection = new HashSet<>(this.getById(id).getFriends());
+        intersection.retainAll(this.getById(otherId).getFriends());
+        return intersection.stream().map(this::getById).collect(Collectors.toSet());
+    }
+
+    private void validate(User user) {
+        if (user.getEmail() == null || user.getEmail().isEmpty()) {
+            log.error("Email не может быть пустым");
+            throw new ValidationException("Email не может быть пустым");
         }
-        users.remove(user.getId());
-        users.put(user.getId(), user);
-        log.debug("Пользователь с id=" + user.getId() + " успешно обновлен.");
-        return user;
-    }
-
-    private User validateUser(User user) {
-        if (user.getEmail().isEmpty() || user.getEmail().isBlank()) {
-            log.info("Email пустой или поле user.email пустое.");
-            throw new ValidationException("Адрес электронной почты не может быть пустым.");
-        } else if (user.getEmail().indexOf("@") == -1) {
-            log.info("Email не содержит @.");
-            throw new ValidationException("Адрес электронной почты должен содержать символ @.");
-        } else if (user.getLogin().isEmpty() || user.getLogin().isBlank()) {
-            log.info("Логин пустой или поле user.login пустое.");
-            throw new ValidationException("Логин не может быть пустым.");
-        } else if (user.getLogin().indexOf(" ") != -1) {
-            log.info("Логин содержит пробел/пробелы.");
-            throw new ValidationException("Логин не может содержать пробелы.");
-        } else if (user.getBirthday().isAfter(LocalDate.now())) {
-            log.info("Дата рождения пользователя указана в будущем.");
-            throw new ValidationException("Дата рождения не может быть в будущем.");
-        } else if (user.getName() == null || user.getName().isEmpty() || user.getName().isBlank()) {
-            log.info("Имя пользователя не указано, полю user.name присвон логин.");
-            user.setName(user.getLogin());
+        if (!user.getEmail().contains(AT)) {
+            log.error("Email должен содержать символ @");
+            throw new ValidationException("Email должен содержать символ @");
         }
-        return user;
+        if (user.getLogin() == null || user.getLogin().isEmpty()) {
+            log.error("Login не может быть пустым");
+            throw new ValidationException("Login не может быть пустым");
+        }
+        if (user.getLogin().contains(SPACE)) {
+            log.error("Login не может содержать пробелы");
+            throw new ValidationException("Login не может содержать пробелы");
+        }
+        if (user.getName() == null || user.getName().isEmpty()) user.setName(user.getLogin());
+        if (user.getBirthday() != null && user.getBirthday().isAfter(LocalDate.now())) {
+            log.error("Birthday не может быть в будущем");
+            throw new ValidationException("Birthday не может быть в будущем");
+        }
     }
 }

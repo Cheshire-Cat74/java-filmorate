@@ -1,26 +1,28 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
+
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
-@Slf4j
+
 @Data
-@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Film {
-
-    public static final LocalDate EARLIEST_DATE_OF_RELEASE = LocalDate.of(1895, 12, 28);
-    public static final int MAX_LENGTH_OF_DESCRIPTION = 200;
-
-    int id;
+    public static int newId = 0;
+    long id;
     String name;
     String description;
     LocalDate releaseDate;
-    long duration;
+    Long duration;
+    Set<Long> likes = new HashSet<>();
+    int rate;
+    Mpa mpa;
+    Set<Genre> genres = new HashSet<>();
+
 
 }
